@@ -51,7 +51,7 @@ function Component() {
 
 When you want to check if you're logged in:
 
-```
+```js
 function AmILoggedInComponent(){
   const isLoggedIn = useAuthStore(s=>s.isLoggedIn);
   if(!isLoggedIn) return <No/>
@@ -64,14 +64,14 @@ function AmILoggedInComponent(){
 Just use the axios client to make requests.
 
 And in your networking function
-```
+```ts
 async function fetchStuff() {
   const r = await axiosClient.get('https://stuff.com/json');
 }
 ```
 
 ## Auth Store Interface
-```js
+```ts
 interface AuthStore {
     isLoggedIn: boolean,
     login: (token: string, refreshToken: string) => void,
@@ -84,7 +84,7 @@ interface AuthStore {
 
 ## Auth Store Options
 All Optionals 
-```
+```ts
 interface AuthStoreOptions {
     persistence?: {
         getItem: (key: string) => Promise<string | null> | (string | null),
@@ -103,7 +103,7 @@ interface AuthStoreOptions {
 
 ## Axios Options
 
-```js
+```ts
 interface AxiosOptions {
     axiosConfig?: AxiosRequestConfig,
     refresh: (token: string)=>Promise<string>,
