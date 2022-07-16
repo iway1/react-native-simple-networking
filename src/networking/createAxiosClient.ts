@@ -1,12 +1,14 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { UseBoundStore, StoreApi } from "zustand";
 import { CreateAuthStoreResult } from "./createAuthenticationStore";
+import { GetAuthHeaderFunction } from "./initializeSimpleNetworking";
 
 export type AxiosOptions = {
     axiosConfig?: AxiosRequestConfig,
     refresh: (token: string)=>Promise<string>,
     attemptRefreshOnStatusCodes?: number[],
     defaultHeaders?: {[name: string]: string},
+    getAuthHeader?: GetAuthHeaderFunction
 }
 
 function shortenData(data: {[key: string]: any} | string) {
@@ -15,7 +17,7 @@ function shortenData(data: {[key: string]: any} | string) {
     console.log("Data: ")
     console.log(typeof data);
     for(var key in data) {
-        r[key] = JSON.stringify(data[key]).slice(0, 400);
+        r[key] = JSON.stringify(data[key])
     }
     return r
 }
@@ -26,6 +28,7 @@ export default function createAxiosClient({
     attemptRefreshOnStatusCodes=[401, 498],
     authStore,
     defaultHeaders,
+    getAuthHeader
 }: AxiosOptions & {
     authStore: CreateAuthStoreResult
 }) {
@@ -40,6 +43,7 @@ export default function createAxiosClient({
         'Content-Type': 'application/json',
         ...defaultHeaders,
     }
+    
     const axiosClient = axios.create(defaultAxiosConfig);
 
     if(defaultHeaders) {
@@ -56,10 +60,19 @@ export default function createAxiosClient({
     axiosClient.interceptors.request.use(config => {
         const authStoreState = authStore.getState();
         if (authStoreState.isLoggedIn && authStoreState.token) {
-            config.headers = {
-                ...config.headers,
-                'authorization': 'Bearer ' + authStoreState.token,
+            if(getAuthHeader) {
+                const {headerKey, headerValue} = getAuthHeader(authStoreState.token);
+                config.headers = {
+                    ...config.headers,
+                    [headerKey]: headerValue
+                }
+            } else {
+                config.headers = {
+                    ...config.headers,
+                    'authorization': 'Bearer ' + authStoreState.token,
+                }
             }
+           
         }
         return config;
     })
@@ -199,6 +212,13 @@ export default function createAxiosClient({
                 logAxiosError(error);
                 throw error
             };
+
+            if(isRetryingLoginRef.value) {
+                await isRetryingLoginRef.retryingPromise;
+                axiosClient(error.config);
+                return;
+            }
+            
             return await onUnauthorizedRequest(error.config);
         } else {
             await logAxiosError(error);
