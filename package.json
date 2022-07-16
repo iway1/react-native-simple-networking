@@ -1,6 +1,6 @@
 {
   "name": "react-native-simple-networking",
-  "version": "1.0.63",
+  "version": "1.0.64",
   "description": "This is a package that implements authentication state using zustand tied to axios interceptors in order to automatically add an 'authorization' header to all requests any time a request is sent with the created axios client. It also provides some basic request logging. The package will attempt to refresh any time an access token is expired, stalling all requests any time a token refresh is going on. ",
   "main": "lib/index.js",
   "scripts": {
