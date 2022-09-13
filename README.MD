@@ -1,5 +1,9 @@
 # Ez Networking (Works with React too)
-just an easy library for handling stateful token based authentication. Uses zustand and axios. Make requests with the axios client, use the auth store too handle check whether user is logged in, to log out, etc.
+An easy library for handling stateful token based authentication. Uses zustand and axios. 
+
+
+
+use the auth store too handle check whether user is logged in, to log out, etc.
 ## Setup
 `npm install react-native-simple-networking`
 
@@ -36,7 +40,13 @@ const {useAuthStore, axiosClient} = init({
 })
 ```
 
-And in your component:
+Make requests with the axios client: 
+```js
+axiosClient.get('https://fakeapi.com/fake-endpoint
+```
+
+
+And in your component use the store:
 
 ```js
 function Component() {
